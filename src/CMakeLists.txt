@@ -7,9 +7,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -D_DEBUG -mtune=native -W -Wall -Wextra -Wshadow")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
-#set(SRCS ...)
+set(SRCS gnudo.cpp )
 
-#add_library(gnudo_core STATIC ${SRCS})
+add_library(gnudo_core STATIC ${SRCS})
 
 add_executable(gnudo main.cpp)
 

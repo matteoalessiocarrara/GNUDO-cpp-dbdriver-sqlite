@@ -4,9 +4,14 @@
 namespace gnudo 
 {
   class GnuDo;
-  class SocketServer;
   class TasksHandler;
   class DatabaseHandler;
+}
+
+namespace util
+{
+  class LogEvent;
+  namespace Socket{}
 }
 
 #endif //__INTERNAL_GNUDO_NAMESPACE_H

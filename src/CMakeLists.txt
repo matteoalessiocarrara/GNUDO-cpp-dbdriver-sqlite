@@ -11,5 +11,7 @@ file(GLOB_RECURSE SRCS "*.cpp")
 
 if(SRCS)
   add_executable(gnudo ${SRCS})
+else()
+  message("-!- SRCS not specified!")
 endif(SRCS)
 

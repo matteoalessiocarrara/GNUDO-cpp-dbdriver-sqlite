@@ -1,22 +1,21 @@
-#ifndef __SOCKET_SERVER_H
-#define __SOCKET_SERVER_H
+#ifndef __SOCKET_H
+#define __SOCKET_H
+
+#define PORT 9999
 
 #include "gnudo_nsp.h"
 
-class gnudo::SocketServer 
+namespace util 
 {
-public:
-  SocketServer(const char* ipaddr="127.0.0.1", 
-	       const unsigned int port=4747);
-  ~SocketServer();
-  int launchServer();
-  int getData();
-  void sendData();
-  
-private:
-  int sockfd;
-  const char* _ipaddr;
-  const char* _port;
-};
+  namespace Socket 
+  {
+    void connect();
+    char* recvMsg();
+    void sendMsg(const char* __msg_data);
+    void endConnection();
+  }
+}
 
-#endif //__SOCKET_SERVER_H
+extern void mainHandler();
+
+#endif //__SOCKET_H

@@ -1,0 +1,8 @@
+[submodule "src/abstract"]
+	path = src/abstract
+	url = https://github.com/matteoalessiocarrara/GNUDO-dbhandler-cpp-abstract
+	branch = dev-ggithub
+[submodule "lib/sqlite3pp"]
+	path = lib/sqlite3pp
+	url = https://github.com/matteoalessiocarrara/sqlite3pp
+	branch = dev-github

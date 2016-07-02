@@ -1,25 +1,17 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
-project(GNUDO CXX)
+add_compile_options(-std=c++11)
 
-if (NOT CMAKE_MODULE_PATH)
-	set(CMAKE_MODULE_PATH "../cmake")
-endif()
+add_library(${PROJECT_NAME} SHARED gnudo.cpp managers.cpp objects.cpp)
+add_executable(testlib test/test.cpp)
 
-find_package(Threads REQUIRED)
-find_package(SQLite3 REQUIRED)
+# XXX
+add_library(sqlite3pp SHARED IMPORTED)
+set_property(TARGET sqlite3pp PROPERTY IMPORTED_LOCATION /usr/local/lib/libsqlite3pp.so)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -mtune=native -W")
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g -D_DEBUG -mtune=native -W -Wall -Wextra -Wshadow")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
+# Serve anche sqlite?
+target_link_libraries(${PROJECT_NAME} sqlite3pp)
+target_link_libraries(testlib ${PROJECT_NAME})
 
-include_directories(${INCLUDE_DIRS})
-
-file(GLOB_RECURSE SRCS "*.cpp")
-
-if(SRCS)
-	add_library(gnudosqlite SHARED ${SRCS})
-	target_link_libraries(gnudosqlite ${CMAKE_THREAD_LIBS_INIT})
-	target_link_libraries(gnudosqlite sqlite3)
-endif(SRCS)
-
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(FILES dbdefs.hpp gnudo.hpp managers.hpp objects.hpp DESTINATION include/${PROJECT_NAME})

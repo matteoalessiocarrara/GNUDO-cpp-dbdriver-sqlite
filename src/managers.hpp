@@ -26,9 +26,9 @@
 # include <vector>
 # include <string>
 
-# include "../lib/sqlite3pp/src/sqlite3pp.hpp"
+# include <sqlite3pp.hpp>
 
-# include "abstract/managers.hpp"
+# include <gnudo-cpp-dbdriver-abstract/managers.hpp>
 # include "objects.hpp"
 
 

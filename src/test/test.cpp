@@ -31,7 +31,6 @@ using std::endl;
 
 int main()
 {	
-	// FIXME Questo non funziona, va messo il percorso completo o da l'errore SqliteMisuse
 	Db db("test.db");
 	
 	sqlite3_int64 id = db.getTasks()->add("Prova", "123 123");

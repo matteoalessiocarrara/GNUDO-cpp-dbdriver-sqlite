@@ -1,12 +1,5 @@
-message("--- Configuring ---")
-include(InstallRequiredSystemLibraries)
-
-cmake_minimum_required(VERSION 2.8)
-project(GNUDO)
-
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "Release")
-endif()
+cmake_minimum_required(VERSION 3.0)
+project(gnudo-cpp-dbdriver-sqlite)
 
 add_subdirectory(src)
 

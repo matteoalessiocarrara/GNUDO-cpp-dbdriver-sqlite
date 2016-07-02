@@ -31,9 +31,9 @@
 
 # include <string>
 
-# include "../lib/sqlite3pp/src/sqlite3pp.hpp"
+# include <sqlite3pp.hpp>
 
-# include "abstract/gnudo.hpp"
+# include <gnudo-cpp-dbdriver-abstract/gnudo.hpp>
 # include "managers.hpp"
 
 

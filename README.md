@@ -1,4 +1,4 @@
 # Dipendenze
 
- * [sqlite3pp](github.com/matteoalessiocarrara/sqlite3pp)
- * [GNUDO-cpp-dbdriver-abstract](github.com/matteoalessiocarrara/GNUDO-cpp-dbdriver-abstract)
+ * [sqlite3pp](https://github.com/matteoalessiocarrara/sqlite3pp)
+ * [GNUDO-cpp-dbdriver-abstract](https://github.com/matteoalessiocarrara/GNUDO-cpp-dbdriver-abstract)

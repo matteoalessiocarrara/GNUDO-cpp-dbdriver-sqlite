@@ -92,14 +92,18 @@ Task::getId() const
 string
 Task::getTitle() const
 {
-	return (const char*)_getColumn<const unsigned char*>("title", sqlite3pp_column_text);
+	const char *tmp = (const char*)_getColumn<const unsigned char*>("title", sqlite3pp_column_text);
+	string r = string(tmp);
+	return r;
 }
 
 
 string
 Task::getDescription() const
 {
-	return (const char*)_getColumn<const unsigned char*>("description", sqlite3pp_column_text);
+	const char *tmp = (const char*)_getColumn<const unsigned char*>("description", sqlite3pp_column_text);
+	string r = string(tmp);
+	return r;
 }
 
 

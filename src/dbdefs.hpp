@@ -20,8 +20,26 @@
 # ifndef GNUDO_SQLITE_DBDEFS_HPP
 # define GNUDO_SQLITE_DBDEFS_HPP
 
+# include <string>
 
-# define GNUDO_SQLITE_TASKS_TABLE "tasks"
+
+namespace gnudo
+{
+	namespace sqlite
+	{
+		namespace dbarch
+		{
+		  using std::string;
+		  
+		  namespace tables
+		  {
+			   const string TASKS = "tasks";
+			   const string PRIORITY_LEVELS = "priority_levels";
+		  }
+		 
+		}
+	}
+}
 
 
 # endif // ifndef GNUDO_SQLITE_DBDEFS_HPP

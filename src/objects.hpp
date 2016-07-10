@@ -56,6 +56,9 @@ namespace gnudo
 				void 			setTitle(const string title);
 				void 			setDescription(const string description);
 				void 			setStatus(const bool isCompleted);
+                void            setCreationTime(const time_t time);
+                void 			setModificationTime(const time_t time);
+
 
 			protected:
 				template <typename R>
@@ -63,7 +66,7 @@ namespace gnudo
 				sqlite3_stmt*	_getSelectStatement(const string columnName) const;
 				sqlite3_stmt*	_getUpdateStatement(const string columnName);
 
-				void 			_setModificationTime(const time_t time);
+
 
 			private:
 				const sqlite3_int64	__id;

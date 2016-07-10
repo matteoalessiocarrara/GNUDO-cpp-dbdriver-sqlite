@@ -25,6 +25,7 @@
 # include <cstdint>
 # include <vector>
 # include <string>
+# include <ctime>
 
 # include <sqlite3pp.hpp>
 
@@ -38,6 +39,8 @@ namespace gnudo
 	{
 		using std::vector;
 		using std::string;
+        using std::time_t;
+        using std::time;
 
 
 		class TasksManager: public gnudo::abstract::TasksManager
@@ -45,7 +48,8 @@ namespace gnudo
 			public:
 												TasksManager(sqlite3 *db);
 
-				sqlite3_int64 					add(const string title, const string desc);
+                sqlite3_int64 					add(const string title="Untitled", const string description="", const time_t creationTime=time(NULL),
+                                                    const time_t modificationTime=time(NULL), const bool completed=false);
 				void 							remove(const gnudo::abstract::Task* task);
 				Task*							getTask(const sqlite3_int64 id);
 				vector<sqlite3_int64>			getIdList() const;

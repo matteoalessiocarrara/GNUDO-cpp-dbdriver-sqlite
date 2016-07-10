@@ -39,7 +39,7 @@ using std::endl;
 using std::time;
 
 
-// WARNING	Ogni metodo che modifica questo task deve chiamare _setModificationTime()
+// WARNING	Ogni metodo che modifica questo task deve chiamare setModificationTime()
 
 
 Task::Task(const sqlite3_int64 id, sqlite3* db): __id(id)
@@ -54,7 +54,7 @@ Task::Task(const sqlite3_int64 id, sqlite3* db): __id(id)
 sqlite3_stmt*
 Task::_getSelectStatement(const string columnName) const
 {
-	const string	sql = "SELECT " + columnName + " FROM " GNUDO_SQLITE_TASKS_TABLE " WHERE id = ?;";
+	const string	sql = "SELECT " + columnName + " FROM " + dbarch::tables::TASKS + " WHERE id = ?;";
 	sqlite3_stmt	*ppStmt;
 
 	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
@@ -131,7 +131,7 @@ Task::isCompleted() const
 sqlite3_stmt*
 Task::_getUpdateStatement(const string columnName)
 {
-	const string	sql = 	"UPDATE " GNUDO_SQLITE_TASKS_TABLE " "
+	const string	sql = 	"UPDATE " + dbarch::tables::TASKS + " "
 							"SET " + columnName + " = ? "
 							"WHERE id = ?;";
 	sqlite3_stmt	*ppStmt;
@@ -153,7 +153,7 @@ Task::setTitle(const string title)
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 
-	_setModificationTime(time(NULL));
+    setModificationTime(time(NULL));
 }
 
 
@@ -166,7 +166,7 @@ Task::setDescription(const string description)
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 	
-	_setModificationTime(time(NULL));
+    setModificationTime(time(NULL));
 }
 
 
@@ -179,18 +179,28 @@ Task::setStatus(const bool isCompleted)
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 	
-	_setModificationTime(time(NULL));
+    setModificationTime(time(NULL));
 }
 
 
 void
-Task::_setModificationTime(const time_t time)
+Task::setModificationTime(const time_t time)
 {
 	sqlite3_stmt *ppStmt = _getUpdateStatement("mtime");
 
 	sqlite3pp_bind_int64(ppStmt, 1, time);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
+}
+
+void
+Task::setCreationTime(const time_t time)
+{
+    sqlite3_stmt *ppStmt = _getUpdateStatement("ctime");
+
+    sqlite3pp_bind_int64(ppStmt, 1, time);
+    sqlite3pp_step(ppStmt);
+    sqlite3_finalize(ppStmt);
 }
 
 

@@ -61,7 +61,7 @@ Db::__createTables()
 	char *err	=	 NULL;
 	string sql	=	"BEGIN TRANSACTION;"
 					
-					"CREATE TABLE  IF NOT EXISTS " GNUDO_SQLITE_TASKS_TABLE
+					"CREATE TABLE  IF NOT EXISTS " + dbarch::tables::TASKS +
 					"(															"
 					"	id INTEGER PRIMARY KEY,									"
 					"	title TEXT NOT NULL,									"
@@ -70,6 +70,9 @@ Db::__createTables()
 					"	mtime INTEGER NOT NULL,									"
 					"	completed INTEGER NOT NULL								"
 					");"
+					
+					//"CREATE TABLE  IF NOT EXISTS " GNUDO_SQLITE_PRIORITY_LEVELS_TABLE
+					
 
 					"END TRANSACTION;";
 

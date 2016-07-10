@@ -43,19 +43,20 @@ TasksManager::TasksManager(sqlite3 *db)
 
 
 sqlite3_int64
-TasksManager::add(const string title, const string desc)
+TasksManager::add(const string title, const string description, const time_t creationTime, const time_t modificationTime, const bool completed)
 {
-	const string	sql	=	"INSERT INTO " GNUDO_SQLITE_TASKS_TABLE " (title, description, ctime, mtime, completed) "
-							"VALUES (?, ?, ?, ?, 0);";
+	const string	sql	=	"INSERT INTO " + dbarch::tables::TASKS + " (title, description, ctime, mtime, completed) "
+                            "VALUES (?, ?, ?, ?, ?);";
 	sqlite3_stmt	*ppStmt;
 
 
 	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
 
 	sqlite3pp_bind_text(ppStmt, 1, title.c_str(), title.size() + 1, SQLITE_STATIC);
-	sqlite3pp_bind_text(ppStmt, 2, desc.c_str(), desc.size() + 1, SQLITE_STATIC);
-	sqlite3pp_bind_int(ppStmt, 3, time(NULL));
-	sqlite3pp_bind_int(ppStmt, 4, time(NULL));
+    sqlite3pp_bind_text(ppStmt, 2, description.c_str(), description.size() + 1, SQLITE_STATIC);
+    sqlite3pp_bind_int(ppStmt, 3, creationTime);
+    sqlite3pp_bind_int(ppStmt, 4, modificationTime);
+    sqlite3pp_bind_int(ppStmt, 5, completed);
 
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
@@ -75,7 +76,7 @@ TasksManager::add(const string title, const string desc)
 void
 TasksManager::remove(const gnudo::abstract::Task* task)
 {
-	const string	sql = "DELETE FROM " GNUDO_SQLITE_TASKS_TABLE " WHERE id = ?;";
+	const string	sql = "DELETE FROM " + dbarch::tables::TASKS + " WHERE id = ?;";
 	sqlite3_stmt	*ppStmt;
 
 	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
@@ -95,7 +96,7 @@ TasksManager::getTask(const sqlite3_int64 id)
 vector<sqlite3_int64>
 TasksManager::getIdList() const
 {
-	const string			sql = "SELECT id FROM " GNUDO_SQLITE_TASKS_TABLE ";";
+	const string			sql = "SELECT id FROM " + dbarch::tables::TASKS + ";";
 	sqlite3_stmt			*ppStmt;
 	vector<sqlite3_int64>	ret;
 

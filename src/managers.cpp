@@ -94,9 +94,10 @@ TasksManager::getTask(const sqlite3_int64 id)
 
 
 vector<sqlite3_int64>
-TasksManager::getIdList() const
+TasksManager::getIdList(Order order, bool asc) const
 {
-	const string			sql = "SELECT id FROM " + dbarch::tables::TASKS + ";";
+	const string			columns[] = {"title", "description", "ctime", "mtime", "completed"};
+	const string			sql = "SELECT id FROM " + dbarch::tables::TASKS + " ORDER BY " + columns[order] + (asc? " ASC" : " DESC") + ";";
 	sqlite3_stmt			*ppStmt;
 	vector<sqlite3_int64>	ret;
 

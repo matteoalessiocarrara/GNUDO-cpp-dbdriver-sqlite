@@ -52,7 +52,7 @@ namespace gnudo
                                                     const time_t modificationTime=time(NULL), const bool completed=false);
 				void 							remove(const gnudo::abstract::Task* task);
 				Task*							getTask(const sqlite3_int64 id);
-				vector<sqlite3_int64>			getIdList() const;
+				vector<sqlite3_int64>			getIdList(Order orderBy=CREATION_TIME, bool asc=false) const;
 
 			private:
 				sqlite3							*__sqlitedb;

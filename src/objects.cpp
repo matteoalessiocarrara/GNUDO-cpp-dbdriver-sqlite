@@ -20,6 +20,7 @@
 # include <ctime>
 # include <string>
 # include <cstdint>
+# include <cstring>
 # include <sstream>
 # include <iostream>
 # include <stdexcept>
@@ -37,6 +38,8 @@ using std::string;
 using std::cout;
 using std::endl;
 using std::time;
+using std::strcpy;
+using std::strlen;
 
 
 // WARNING	Ogni metodo che modifica questo task deve chiamare setModificationTime()
@@ -66,16 +69,28 @@ Task::_getSelectStatement(const string columnName) const
 
 template <typename R>
 R
-Task::_getColumn(const string columnName, R (*sqlite3ppfunc) (sqlite3_stmt* ppStmt, int iCol, sqlite3* db)) const
+Task::_getColumn(const string columnName, R (*sqlite3ppfunc) (sqlite3_stmt* ppStmt, int iCol, sqlite3* db), bool isString) const
 {
 	sqlite3_stmt *ppStmt = _getSelectStatement(columnName);
-	R ret;
+	R tmp, ret;
+	size_t dataSize;
 
 	if (sqlite3pp_step(ppStmt) == SQLITE_ROW)
-		ret = sqlite3ppfunc(ppStmt, 0, __sqlitedb);
+	{
+		ret = tmp = sqlite3ppfunc(ppStmt, 0, __sqlitedb);
+
+		if (isString)
+		{
+			ret = (R)malloc(strlen((char*)tmp) + 1);
+			strcpy((char*)ret, (char*)tmp);
+		}
+
+	}
 	else
 		throw std::runtime_error("Impossibile ottenere la colonna '" + columnName +"'");
 
+	// ATTENZIONE: I puntatori ottenuti con sqlite3ppfunc() non saranno
+	// più validi dopo questa funzione, quindi i dati devono essere copiati prima
 	sqlite3_finalize(ppStmt);
 
 	return ret;
@@ -92,7 +107,7 @@ Task::getId() const
 string
 Task::getTitle() const
 {
-	const char *tmp = (const char*)_getColumn<const unsigned char*>("title", sqlite3pp_column_text);
+	const char *tmp = (const char*)_getColumn<const unsigned char*>("title", sqlite3pp_column_text, true);
 	string r = string(tmp);
 	return r;
 }
@@ -101,7 +116,7 @@ Task::getTitle() const
 string
 Task::getDescription() const
 {
-	const char *tmp = (const char*)_getColumn<const unsigned char*>("description", sqlite3pp_column_text);
+	const char *tmp = (const char*)_getColumn<const unsigned char*>("description", sqlite3pp_column_text, true);
 	string r = string(tmp);
 	return r;
 }

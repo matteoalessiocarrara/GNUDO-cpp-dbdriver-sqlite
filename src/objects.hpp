@@ -62,7 +62,7 @@ namespace gnudo
 
 			protected:
 				template <typename R>
-				R 				_getColumn(const string columnName, R (*sqlite3ppfunc) (sqlite3_stmt* ppStmt, int iCol, sqlite3* db)) const;				
+				R 				_getColumn(const string columnName, R (*sqlite3ppfunc) (sqlite3_stmt* ppStmt, int iCol, sqlite3* db), bool isString=false) const;
 				sqlite3_stmt*	_getSelectStatement(const string columnName) const;
 				sqlite3_stmt*	_getUpdateStatement(const string columnName);
 

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_compile_options(-std=c++11)
+# So quello che faccio, statti zitto compilatore incapace
+add_compile_options(-std=c++11 -fpermissive)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
 
 add_library(${PROJECT_NAME} SHARED gnudo.cpp managers.cpp objects.cpp)
 add_executable(testlib test/test.cpp)

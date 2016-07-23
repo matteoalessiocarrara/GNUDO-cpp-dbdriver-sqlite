@@ -20,7 +20,6 @@
 # include <ctime>
 # include <string>
 # include <cstdint>
-# include <cstring>
 # include <sstream>
 # include <iostream>
 # include <stdexcept>
@@ -33,194 +32,194 @@
 
 using namespace sqlite3pp::functions;
 using namespace gnudo::sqlite;
+using namespace dbdefs;
 using std::int64_t;
 using std::string;
 using std::cout;
 using std::endl;
 using std::time;
-using std::strcpy;
-using std::strlen;
 
 
 // WARNING	Ogni metodo che modifica questo task deve chiamare setModificationTime()
+// A parte setModificationTime ovviamente XD
 
 
-Task::Task(const sqlite3_int64 id, sqlite3* db): __id(id)
+Task::Task(const int64_t id, sqlite3* db, TasksManager *parentManager): sqlite3pp::objects::Row(db, tables::tasks, id), gnudo::abstract::Task((gnudo::abstract::TasksManager*)parentManager)
 {
-	 __sqlitedb = db;
-}
-
-
-// GET
-
-
-sqlite3_stmt*
-Task::_getSelectStatement(const string columnName) const
-{
-	const string	sql = "SELECT " + columnName + " FROM " + dbarch::tables::TASKS + " WHERE id = ?;";
-	sqlite3_stmt	*ppStmt;
-
-	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
-	sqlite3pp_bind_int64(ppStmt, 1, getId());
-
-	return ppStmt;
-}
-
-
-template <typename R>
-R
-Task::_getColumn(const string columnName, R (*sqlite3ppfunc) (sqlite3_stmt* ppStmt, int iCol, sqlite3* db), bool isString) const
-{
-	sqlite3_stmt *ppStmt = _getSelectStatement(columnName);
-	R tmp, ret;
-	size_t dataSize;
-
-	if (sqlite3pp_step(ppStmt) == SQLITE_ROW)
-	{
-		ret = tmp = sqlite3ppfunc(ppStmt, 0, __sqlitedb);
-
-		if (isString)
-		{
-			ret = (R)malloc(strlen((char*)tmp) + 1);
-			strcpy((char*)ret, (char*)tmp);
-		}
-
-	}
-	else
-		throw std::runtime_error("Impossibile ottenere la colonna '" + columnName +"'");
-
-	// ATTENZIONE: I puntatori ottenuti con sqlite3ppfunc() non saranno
-	// più validi dopo questa funzione, quindi i dati devono essere copiati prima
-	sqlite3_finalize(ppStmt);
-
-	return ret;
-}
-
-
-sqlite3_int64
-Task::getId() const
-{
-	return __id;
 }
 
 
 string
 Task::getTitle() const
 {
-	const char *tmp = (const char*)_getColumn<const unsigned char*>("title", sqlite3pp_column_text, true);
-	string r = string(tmp);
-	return r;
+	return (const char*)getColumn<const unsigned char*>(columns::task::title, sqlite3pp_column_text);
 }
 
 
 string
 Task::getDescription() const
 {
-	const char *tmp = (const char*)_getColumn<const unsigned char*>("description", sqlite3pp_column_text, true);
-	string r = string(tmp);
-	return r;
+	return (const char*)getColumn<const unsigned char*>(columns::task::description, sqlite3pp_column_text);
 }
 
 
+int
+Task::getPriorityLevel() const
+{
+	return getColumn<int>(columns::task::priority, sqlite3pp_column_int);
+}
+
+		class Db;
 time_t
 Task::getCreationTime() const
 {
-	return _getColumn<sqlite3_int64>("ctime", sqlite3pp_column_int64);
+	return getColumn<sqlite3_int64>(columns::task::creationTime, sqlite3pp_column_int64);
 }
 
 
 time_t
 Task::getModificationTime() const
 {
-	return _getColumn<sqlite3_int64>("mtime", sqlite3pp_column_int64);
+	return getColumn<sqlite3_int64>(columns::task::modificationTime, sqlite3pp_column_int64);
 }
 
 
 bool 
 Task::isCompleted() const
 {
-	return _getColumn<int>("completed", sqlite3pp_column_int);
-}
-
-
-// SET
-
-
-// Sqlite3 bind sul parametro 1 con il valore
-sqlite3_stmt*
-Task::_getUpdateStatement(const string columnName)
-{
-	const string	sql = 	"UPDATE " + dbarch::tables::TASKS + " "
-							"SET " + columnName + " = ? "
-							"WHERE id = ?;";
-	sqlite3_stmt	*ppStmt;
-
-
-	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
-	sqlite3pp_bind_int64(ppStmt, 2, getId());
-
-	return ppStmt;
+	return getColumn<int>(columns::task::completed, sqlite3pp_column_int);
 }
 
 
 void
 Task::setTitle(const string title)
 {
-	sqlite3_stmt *ppStmt = _getUpdateStatement("title");
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::title);
 
 	sqlite3pp_bind_text(ppStmt, 1, title.c_str(), title.size() + 1, SQLITE_STATIC);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 
-    setModificationTime(time(NULL));
+	setModificationTime(time(NULL));
 }
 
 
 void
 Task::setDescription(const string description)
 {
-	sqlite3_stmt *ppStmt = _getUpdateStatement("description");
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::description);
 
 	sqlite3pp_bind_text(ppStmt, 1, description.c_str(), description.size() + 1, SQLITE_STATIC);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 	
-    setModificationTime(time(NULL));
+	setModificationTime(time(NULL));
+}
+
+
+void
+Task::setPriorityLevel(const int level)
+{
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::priority);
+
+	sqlite3pp_bind_int(ppStmt, 1, level);
+	sqlite3pp_step(ppStmt);
+	sqlite3_finalize(ppStmt);
+	
+	setModificationTime(time(NULL));
 }
 
 
 void
 Task::setStatus(const bool isCompleted)
 {
-	sqlite3_stmt *ppStmt = _getUpdateStatement("completed");
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::completed);
 
 	sqlite3pp_bind_int(ppStmt, 1, isCompleted);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 	
-    setModificationTime(time(NULL));
+	setModificationTime(time(NULL));
 }
 
 
 void
-Task::setModificationTime(const time_t time)
+Task::setCreationTime(const time_t time)
 {
-	sqlite3_stmt *ppStmt = _getUpdateStatement("mtime");
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::creationTime);
 
 	sqlite3pp_bind_int64(ppStmt, 1, time);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 }
 
-void
-Task::setCreationTime(const time_t time)
-{
-    sqlite3_stmt *ppStmt = _getUpdateStatement("ctime");
 
-    sqlite3pp_bind_int64(ppStmt, 1, time);
-    sqlite3pp_step(ppStmt);
-    sqlite3_finalize(ppStmt);
+void
+Task::setModificationTime(const time_t time)
+{
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::modificationTime);
+
+	sqlite3pp_bind_int64(ppStmt, 1, time);
+	sqlite3pp_step(ppStmt);
+	sqlite3_finalize(ppStmt);
 }
 
 
+PriorityLevel::PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager): sqlite3pp::objects::Row(db, tables::priorityLevels, id), gnudo::abstract::PriorityLevel((gnudo::abstract::PriorityLevelsManager*)parentManager)
+{
+}
+
+
+string
+PriorityLevel::getColor() const
+{
+	return (const char*)getColumn<const unsigned char*>(columns::prioritylevel::color, sqlite3pp_column_text);
+}
+
+
+int
+PriorityLevel::getLevel() const
+{
+	return getColumn<int>(columns::prioritylevel::priority, sqlite3pp_column_int);
+}
+
+
+string
+PriorityLevel::getName() const
+{
+	return (const char*)getColumn<const unsigned char*>(columns::prioritylevel::name, sqlite3pp_column_text);
+}
+
+
+void
+PriorityLevel::setColor(const string color)
+{
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::prioritylevel::color);
+
+	sqlite3pp_bind_text(ppStmt, 1, color.c_str(), color.size() + 1, SQLITE_STATIC);
+	sqlite3pp_step(ppStmt);
+	sqlite3_finalize(ppStmt);
+}
+
+
+void
+PriorityLevel::setLevel(const int level)
+{
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::prioritylevel::priority);
+
+	sqlite3pp_bind_int(ppStmt, 1, level);
+	sqlite3pp_step(ppStmt);
+	sqlite3_finalize(ppStmt);
+}
+
+
+void
+PriorityLevel::setName(const string name)
+{
+	sqlite3_stmt *ppStmt = getUpdateStatement(columns::prioritylevel::name);
+
+	sqlite3pp_bind_text(ppStmt, 1, name.c_str(), name.size() + 1, SQLITE_STATIC);
+	sqlite3pp_step(ppStmt);
+	sqlite3_finalize(ppStmt);
+}
 

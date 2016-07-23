@@ -23,46 +23,63 @@
 # include <iostream>
 # include <stdexcept>
 
+# include <sqlite3.h>
 # include <sqlite3pp.hpp>
 
 # include "dbdefs.hpp"
 # include "managers.hpp"
+#include "gnudo.hpp"
 
 
+using namespace gnudo::abstract::exceptions;
 using namespace sqlite3pp::functions;
 using namespace gnudo::sqlite;
+using namespace dbdefs;
 using std::int64_t;
 using std::string;
 using std::time;
+using std::to_string;
+using std::vector;
 
 
-TasksManager::TasksManager(sqlite3 *db)
+TasksManager::TasksManager(sqlite3 *db, Db *gnudoDb): sqlite3pp::objects::Table(db, tables::tasks), gnudo::abstract::TasksManager(gnudoDb)
 {
-	__sqlitedb = db;
 }
 
 
-sqlite3_int64
-TasksManager::add(const string title, const string description, const time_t creationTime, const time_t modificationTime, const bool completed)
+int64_t
+TasksManager::add(const int priorityId, const string title, const string description, const time_t creationTime, const time_t modificationTime, const bool completed)
 {
-	const string	sql	=	"INSERT INTO " + dbarch::tables::TASKS + " (title, description, ctime, mtime, completed) "
-                            "VALUES (?, ?, ?, ?, ?);";
+	const string	sql	=	"INSERT INTO " + tables::tasks + " "
+							"("
+							+ columns::task::title + ", "
+							+ columns::task::description + ", "
+							+ columns::task::creationTime + ", "
+							+ columns::task::modificationTime + ", "
+							+ columns::task::priority + ", "
+							+ columns::task::completed +
+							")"
+							"VALUES (?, ?, ?, ?, ?, ?);";
 	sqlite3_stmt	*ppStmt;
 
+	// Se non esiste solleverà un eccezione
+	gnudo::abstract::Manager::getParentDb()->getPriorityLevels()->getPriorityLevel(priorityId);
 
-	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
+	
+	sqlite3pp_prepare_v2(sqlite3pp::objects::Table::getParentDb(), sql.c_str(), sql.size() + 1, &ppStmt, NULL);
 
 	sqlite3pp_bind_text(ppStmt, 1, title.c_str(), title.size() + 1, SQLITE_STATIC);
-    sqlite3pp_bind_text(ppStmt, 2, description.c_str(), description.size() + 1, SQLITE_STATIC);
-    sqlite3pp_bind_int(ppStmt, 3, creationTime);
-    sqlite3pp_bind_int(ppStmt, 4, modificationTime);
-    sqlite3pp_bind_int(ppStmt, 5, completed);
+	sqlite3pp_bind_text(ppStmt, 2, description.c_str(), description.size() + 1, SQLITE_STATIC);
+	sqlite3pp_bind_int(ppStmt, 3, creationTime);
+	sqlite3pp_bind_int(ppStmt, 4, modificationTime);
+	sqlite3pp_bind_int(ppStmt, 5, priorityId);
+	sqlite3pp_bind_int(ppStmt, 6, completed);
 
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 
 
-	sqlite3_int64 taskId = sqlite3_last_insert_rowid(__sqlitedb);
+	sqlite3_int64 taskId = sqlite3_last_insert_rowid(sqlite3pp::objects::Table::getParentDb());
 	
 	if (taskId == 0)
 		throw std::runtime_error("Id dell'ultimo task inserito non trovato");
@@ -72,42 +89,104 @@ TasksManager::add(const string title, const string description, const time_t cre
 }
 
 
-
-void
-TasksManager::remove(const gnudo::abstract::Task* task)
+vector<int64_t>
+TasksManager::getIdList(int orderBy, bool ascending) const
 {
-	const string	sql = "DELETE FROM " + dbarch::tables::TASKS + " WHERE id = ?;";
-	sqlite3_stmt	*ppStmt;
-
-	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
-	sqlite3pp_bind_int64(ppStmt, 1, ((gnudo::sqlite::Task*)task)->getId());
-	sqlite3pp_step(ppStmt);
-	sqlite3_finalize(ppStmt);
+	switch(orderBy)
+	{
+		case TITLE:
+			sqlite3pp::objects::Table::getIdList(columns::task::title, ascending);
+			break;
+		case DESCRIPTION:
+			sqlite3pp::objects::Table::getIdList(columns::task::description, ascending);
+			break;
+		case CREATION_TIME:
+			sqlite3pp::objects::Table::getIdList(columns::task::creationTime, ascending);
+			break;
+		case MODIFICATION_TIME:
+			sqlite3pp::objects::Table::getIdList(columns::task::modificationTime, ascending);
+			break;
+		case PRIORITY:
+			sqlite3pp::objects::Table::getIdList(columns::task::priority, ascending);
+			break;
+		case COMPLETED:
+			sqlite3pp::objects::Table::getIdList(columns::task::completed, ascending);
+			break;
+		// TODO Default?
+	}
 }
+
 
 
 Task*
-TasksManager::getTask(const sqlite3_int64 id)
+TasksManager::getTask(const int64_t id) const
 {
-	return new Task(id, __sqlitedb);
+	if (not isValidId(id))
+		throw ObjectNotFoundException("Task non trovato: " + to_string(id));
+
+	return new Task(id, sqlite3pp::objects::Table::getParentDb(), this);
 }
 
 
-vector<sqlite3_int64>
-TasksManager::getIdList(Order order, bool asc) const
+void
+TasksManager::remove(const int64_t id)
 {
-	const string			columns[] = {"title", "description", "ctime", "mtime", "completed"};
-	const string			sql = "SELECT id FROM " + dbarch::tables::TASKS + " ORDER BY " + columns[order] + (asc? " ASC" : " DESC") + ";";
-	sqlite3_stmt			*ppStmt;
-	vector<sqlite3_int64>	ret;
+	sqlite3pp::objects::Table::remove(id);
+}
 
-	sqlite3pp_prepare_v2(__sqlitedb, sql.c_str(), sql.size() + 1, &ppStmt, NULL);
 
-	while(sqlite3pp_step(ppStmt) == SQLITE_ROW)
-		ret.insert(ret.end(), sqlite3pp_column_int64(ppStmt, 0, __sqlitedb));
+PriorityLevelsManager::PriorityLevelsManager(sqlite3* db, Db *gnudoDb): sqlite3pp::objects::Table(db, tables::priorityLevels), gnudo::abstract::PriorityLevelsManager(gnudoDb)
+{
+}
 
+
+int64_t
+PriorityLevelsManager::add(const string name, const int priority, const string color)
+{
+	const string	sql	=	"INSERT INTO " + tables::priorityLevels + " "
+							"("
+							+ columns::prioritylevel::name + ", "
+							+ columns::prioritylevel::priority + ", "
+							+ columns::prioritylevel::color + 
+							") "
+							"VALUES (?, ?, ?);";
+	sqlite3_stmt	*ppStmt;
+
+
+	sqlite3pp_prepare_v2(sqlite3pp::objects::Table::getParentDb(), sql.c_str(), sql.size() + 1, &ppStmt, NULL);
+
+	sqlite3pp_bind_text(ppStmt, 1, name.c_str(), name.size() + 1, SQLITE_STATIC);
+	sqlite3pp_bind_int(ppStmt, 2, priority);
+	sqlite3pp_bind_text(ppStmt, 3, color.c_str(), color.size() + 1, SQLITE_STATIC);
+
+	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 
-	return ret;
+
+	sqlite3_int64 priorityLevelId = sqlite3_last_insert_rowid(sqlite3pp::objects::Table::getParentDb());
+	
+	if (priorityLevelId == 0)
+		throw std::runtime_error("Id dell'ultimo priority level inserito non trovato");
+
+	return priorityLevelId;
 }
+
+
+PriorityLevel *
+PriorityLevelsManager::getPriorityLevel(const int64_t id) const
+{
+	if (not isValidId(id))
+		throw ObjectNotFoundException("Livello di priorità non trovato: " + to_string(id));
+	
+	return new PriorityLevel(id, sqlite3pp::objects::Table::getParentDb(), this);
+}
+
+
+void
+PriorityLevelsManager::remove(const int64_t id)
+{
+	sqlite3pp::objects::Table::remove(id);
+}
+
+
 

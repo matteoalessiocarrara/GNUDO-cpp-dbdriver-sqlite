@@ -27,15 +27,40 @@ namespace gnudo
 {
 	namespace sqlite
 	{
-		namespace dbarch
+		namespace dbdefs
 		{
-		  using std::string;
+			using std::string;
 		  
-		  namespace tables
-		  {
-			   const string TASKS = "tasks";
-			   const string PRIORITY_LEVELS = "priority_levels";
-		  }
+			
+			namespace tables
+			{
+				const string tasks = "tasks";
+				const string priorityLevels = "priority_levels";
+			}
+			
+			
+			namespace columns
+			{
+				namespace task
+				{
+					const string id = "id";
+					const string title = "title"; 
+					const string description = "description";
+					const string creationTime = "ctime";
+					const string modificationTime = "mtime";
+					const string completed = "completed";
+					const string priority = "priority";
+				}
+				
+				namespace prioritylevel
+				{
+						//id name color priority
+					const string id = "id";
+					const string name = "name";
+					const string color = "color";
+					const string priority = "priority";
+				}
+			}
 		 
 		}
 	}
@@ -43,3 +68,4 @@ namespace gnudo
 
 
 # endif // ifndef GNUDO_SQLITE_DBDEFS_HPP
+

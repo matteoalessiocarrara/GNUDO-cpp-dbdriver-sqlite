@@ -20,10 +20,12 @@
 
 // Header principale
 
-// TODO Leggere convenzioni SQL
 // TODO Serve libreria per logging (?)
 // TODO Liberare memoria puntatori
 // TODO Rimuovere include/using inutili
+// TODO Riutilizzare sqlite3_stmt
+// TODO Rinominare define da GNUDO_SQLITE_* a GNUDO_CPP_DBDRIVER_SQLITE_* ?
+
 
 # ifndef GNUDO_SQLITE_GNUDO_HPP
 # define GNUDO_SQLITE_GNUDO_HPP
@@ -32,8 +34,8 @@
 # include <string>
 
 # include <sqlite3pp.hpp>
-
 # include <gnudo-cpp-dbdriver-abstract/gnudo.hpp>
+
 # include "managers.hpp"
 
 
@@ -47,16 +49,20 @@ namespace gnudo
 		class Db: public gnudo::abstract::Db
 		{
 			public:
-								Db(const string filename);
-								~Db();
-				TasksManager*	getTasks();
+										Db(const string filename);
+										~Db();
+				TasksManager*			getTasks();
+				PriorityLevelsManager* 	getPriorityLevels();
 
 			private:
-				void 			__createTables();
+				void 					__createTables();
 				
-				sqlite3			*__sqlitedb;
-				TasksManager	*__tasksManager;
+				sqlite3					*__sqlitedb;
+				TasksManager			*__tasksManager;
+				PriorityLevelsManager	*__priorityLevels;
 		};
+		
+
 	}
 }
 

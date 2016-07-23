@@ -27,9 +27,10 @@
 # include <string>
 # include <ctime>
 
-# include <sqlite3pp.hpp>
 
+# include <sqlite3pp.hpp>
 # include <gnudo-cpp-dbdriver-abstract/managers.hpp>
+
 # include "objects.hpp"
 
 
@@ -39,23 +40,38 @@ namespace gnudo
 	{
 		using std::vector;
 		using std::string;
-        using std::time_t;
-        using std::time;
+		using std::time_t;
+		using std::time;
+		using std::int64_t;
+		
+		class Db;
 
 
-		class TasksManager: public gnudo::abstract::TasksManager
+		// TODO Non tutti i metodi di sqlite3pp::objects::Table dovrebbero essere visibili in queste classi...
+
+		
+		class TasksManager: public sqlite3pp::objects::Table, public gnudo::abstract::TasksManager
 		{
 			public:
-												TasksManager(sqlite3 *db);
+								TasksManager(sqlite3 *db, Db *gnudoDb);
+				int64_t			add(const int priorityId, const string title="Untitled", const string description="", const time_t creationTime=time(NULL),
+									const time_t modificationTime=time(NULL), const bool completed=false);
+				vector<int64_t>	getIdList(int orderBy, bool ascending=false) const;
+				Task*			getTask(const int64_t id) const;
+				void			remove(const int64_t id);
+		};
+		
+		
+		class PriorityLevelsManager: public sqlite3pp::objects::Table, public gnudo::abstract::PriorityLevelsManager
+		{
+			public:
+									PriorityLevelsManager(sqlite3 *db, Db *gnudoDb);
 
-                sqlite3_int64 					add(const string title="Untitled", const string description="", const time_t creationTime=time(NULL),
-                                                    const time_t modificationTime=time(NULL), const bool completed=false);
-				void 							remove(const gnudo::abstract::Task* task);
-				Task*							getTask(const sqlite3_int64 id);
-				vector<sqlite3_int64>			getIdList(Order orderBy=CREATION_TIME, bool asc=false) const;
-
-			private:
-				sqlite3							*__sqlitedb;
+				// TODO cambiare priority in unsigned
+				int64_t	 		add(const string name, const int priority, const string color="#00ff00"); // TODO Possono esistere due con la stessa priorità?
+				vector<int64_t> getIdList(int orderBy, bool ascending=false) const;
+				PriorityLevel*	getPriorityLevel(const int64_t id) const;
+				void			remove(const int64_t id); // WARNING Non deve essere chiamato questo direttamente, ma il metodo ereditato da gnudo::abstract::PriorityLevelsManager
 		};
 	}
 }

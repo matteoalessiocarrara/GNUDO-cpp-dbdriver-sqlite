@@ -28,7 +28,6 @@
 # include <ctime>
 
 # include <sqlite3pp.hpp>
-
 # include <gnudo-cpp-dbdriver-abstract/objects.hpp>
 
 
@@ -39,38 +38,47 @@ namespace gnudo
 		using std::int64_t;
 		using std::string;
 		using std::time_t;
+		
+		class TasksManager;
+		class PriorityLevelsManager;
+		
+		
+		// TODO Non tutti i metodi di sqlite3pp::objects::Row dovrebbero essere visibili in queste classi derivate!
+		
 
-
-		class Task: public gnudo::abstract::Task
+		class Task: public sqlite3pp::objects::Row, public gnudo::abstract::Task
 		{
 			public:
-								Task(const sqlite3_int64 id, sqlite3* db);
+								Task(const int64_t id, sqlite3 *db, TasksManager *parentManager);
 
-				sqlite3_int64	getId() const;
 				string			getTitle() const;
 				string			getDescription() const;
+				int				getPriorityLevel() const;
 				time_t 			getCreationTime() const;
 				time_t 			getModificationTime() const;
 				bool 			isCompleted() const;
 
 				void 			setTitle(const string title);
 				void 			setDescription(const string description);
+				void			setPriorityLevel(const int level);
+				void			setCreationTime(const time_t time);
+				void 			setModificationTime(const time_t time);
 				void 			setStatus(const bool isCompleted);
-                void            setCreationTime(const time_t time);
-                void 			setModificationTime(const time_t time);
+		};
+		
 
-
-			protected:
-				template <typename R>
-				R 				_getColumn(const string columnName, R (*sqlite3ppfunc) (sqlite3_stmt* ppStmt, int iCol, sqlite3* db), bool isString=false) const;
-				sqlite3_stmt*	_getSelectStatement(const string columnName) const;
-				sqlite3_stmt*	_getUpdateStatement(const string columnName);
-
-
-
-			private:
-				const sqlite3_int64	__id;
-				sqlite3 			*__sqlitedb;
+		class PriorityLevel: public sqlite3pp::objects::Row, public gnudo::abstract::PriorityLevel
+		{
+			public:
+				PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager);
+				
+				string	getName() const;
+				int		getLevel() const;
+				string 	getColor() const;
+				
+				void	setName(const string name);
+				void	setLevel(const int level);
+				void	setColor(const string color);
 		};
 	}
 }

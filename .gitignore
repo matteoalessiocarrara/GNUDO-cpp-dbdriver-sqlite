@@ -4,3 +4,6 @@ a.out
 *.gch
 *~
 CMakeLists.txt.user
+/.kdev4/
+/GNUDO-cpp-dbdriver-sqlite.kdev4
+

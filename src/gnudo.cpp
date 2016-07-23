@@ -31,20 +31,23 @@ using namespace gnudo::sqlite;
 using std::string;
 
 
-
 Db::Db(const string filename)
 {
 	sqlite3pp_open(filename.c_str(), &__sqlitedb);
 
 	__createTables();
-	__tasksManager = new TasksManager(__sqlitedb);
+
+	__tasksManager = new TasksManager(__sqlitedb, this);
+	__priorityLevels = new PriorityLevelsManager(__sqlitedb, this);
 }
 
 
 Db::~Db()
 {
 	sqlite3pp_close(__sqlitedb);
+
 	delete __tasksManager;
+	delete __priorityLevels;
 }
 
 
@@ -55,25 +58,39 @@ Db::getTasks()
 }
 
 
+PriorityLevelsManager *
+Db::getPriorityLevels()
+{
+	return __priorityLevels;
+}
+
+
 void
 Db::__createTables()
 {	
 	char *err	=	 NULL;
 	string sql	=	"BEGIN TRANSACTION;"
+					"PRAGMA foreign_keys = ON;"
 					
-					"CREATE TABLE  IF NOT EXISTS " + dbarch::tables::TASKS +
-					"(															"
-					"	id INTEGER PRIMARY KEY,									"
-					"	title TEXT NOT NULL,									"
-					"	description TEXT,										"
-					"	ctime INTEGER NOT NULL,									"
-					"	mtime INTEGER NOT NULL,									"
-					"	completed INTEGER NOT NULL								"
+					"CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::tasks +
+					"("
+					+ dbdefs::columns::task::id + " INTEGER PRIMARY KEY,"
+					+ dbdefs::columns::task::title	+ "	TEXT NOT NULL,"
+					+ dbdefs::columns::task::description + " TEXT,"
+					+ dbdefs::columns::task::creationTime + " INTEGER NOT NULL,"
+					+ dbdefs::columns::task::modificationTime + " INTEGER NOT NULL,"
+					+ dbdefs::columns::task::completed + " INTEGER NOT NULL,"
+					"FOREIGN KEY(" + dbdefs::columns::task::priority + ") NOT NULL REFERENCES "  + dbdefs::tables::priorityLevels + "(" + dbdefs::columns::prioritylevel::id + ") ON DELETE RESTRICT"
 					");"
 					
-					//"CREATE TABLE  IF NOT EXISTS " GNUDO_SQLITE_PRIORITY_LEVELS_TABLE
+					"CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::priorityLevels +
+					"("
+					+ dbdefs::columns::prioritylevel::id + " INTEGER PRIMARY KEY,"
+					+ dbdefs::columns::prioritylevel::name + "	TEXT NOT NULL,"
+					+ dbdefs::columns::prioritylevel::color + " TEXT NOT NULL,"
+					+ dbdefs::columns::prioritylevel::priority + " INTEGER NOT NULL"
+					");"
 					
-
 					"END TRANSACTION;";
 
 	sqlite3pp_exec(__sqlitedb, sql.c_str(), NULL, NULL, &err);	

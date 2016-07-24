@@ -112,6 +112,9 @@ TasksManager::getIdList(int orderBy, bool ascending) const
 		case COMPLETED:
 			sqlite3pp::objects::Table::getIdList(columns::task::completed, ascending);
 			break;
+		case ID:
+			sqlite3pp::objects::Table::getIdList(columns::task::id, ascending);
+			break;
 		// TODO Default?
 	}
 }
@@ -169,6 +172,27 @@ PriorityLevelsManager::add(const string name, const int priority, const string c
 		throw std::runtime_error("Id dell'ultimo priority level inserito non trovato");
 
 	return priorityLevelId;
+}
+
+
+vector<int64_t>
+PriorityLevelsManager::getIdList(int orderBy, bool ascending) const
+{
+	switch(orderBy)
+	{
+		case NAME:
+			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::name, ascending);
+			break;
+		case PRIORITY:
+			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::priority, ascending);
+			break;
+		case COLOR:
+			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::color, ascending);
+			break;
+		case ID:
+			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::id, ascending);
+			break;
+	}
 }
 
 

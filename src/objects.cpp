@@ -121,11 +121,11 @@ Task::setDescription(const string description)
 
 
 void
-Task::setPriorityLevel(const int level)
+Task::setPriorityLevel(const int priorityId)
 {
 	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::priority);
 
-	sqlite3pp_bind_int(ppStmt, 1, level);
+	sqlite3pp_bind_int(ppStmt, 1, priorityId);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 	

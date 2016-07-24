@@ -74,7 +74,7 @@ namespace gnudo
 
 				void 			setTitle(const string title);
 				void 			setDescription(const string description);
-				void			setPriorityLevel(const int level);
+				void			setPriorityLevel(const int priorityId);
 				void			setCreationTime(const time_t time);
 				void 			setModificationTime(const time_t time);
 				void 			setStatus(const bool isCompleted);

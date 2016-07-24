@@ -56,7 +56,7 @@ namespace gnudo
 								TasksManager(sqlite3 *db, Db *gnudoDb);
 				int64_t			add(const int priorityId, const string title="Untitled", const string description="", const time_t creationTime=time(NULL),
 									const time_t modificationTime=time(NULL), const bool completed=false);
-				vector<int64_t>	getIdList(int orderBy, bool ascending=false) const;
+				vector<int64_t>	getIdList(int orderBy=Order::PRIORITY, bool ascending=false) const;
 				Task*			getTask(const int64_t id) const;
 				void			remove(const int64_t id);
 		};
@@ -69,7 +69,7 @@ namespace gnudo
 
 				// TODO cambiare priority in unsigned
 				int64_t	 		add(const string name, const int priority, const string color="#00ff00"); // TODO Possono esistere due con la stessa priorità?
-				vector<int64_t> getIdList(int orderBy, bool ascending=false) const;
+				vector<int64_t> getIdList(int orderBy=Order::PRIORITY, bool ascending=false) const;
 				PriorityLevel*	getPriorityLevel(const int64_t id) const;
 				void			remove(const int64_t id); // WARNING Non deve essere chiamato questo direttamente, ma il metodo ereditato da gnudo::abstract::PriorityLevelsManager
 		};

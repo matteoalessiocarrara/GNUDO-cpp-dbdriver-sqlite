@@ -42,10 +42,24 @@ namespace gnudo
 		class TasksManager;
 		class PriorityLevelsManager;
 		
-		
 		// TODO Non tutti i metodi di sqlite3pp::objects::Row dovrebbero essere visibili in queste classi derivate!
 		
-
+		
+		class PriorityLevel: public sqlite3pp::objects::Row, public gnudo::abstract::PriorityLevel
+		{
+		public:
+			PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager);
+			
+			string	getName() const;
+			int		getLevel() const;
+			string 	getColor() const;
+			
+			void	setName(const string name);
+			void	setLevel(const int level);
+			void	setColor(const string color);
+		};
+		
+		
 		class Task: public sqlite3pp::objects::Row, public gnudo::abstract::Task
 		{
 			public:
@@ -53,7 +67,7 @@ namespace gnudo
 
 				string			getTitle() const;
 				string			getDescription() const;
-				int				getPriorityLevel() const;
+				PriorityLevel	*getPriorityLevel() const;
 				time_t 			getCreationTime() const;
 				time_t 			getModificationTime() const;
 				bool 			isCompleted() const;
@@ -67,19 +81,7 @@ namespace gnudo
 		};
 		
 
-		class PriorityLevel: public sqlite3pp::objects::Row, public gnudo::abstract::PriorityLevel
-		{
-			public:
-				PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager);
-				
-				string	getName() const;
-				int		getLevel() const;
-				string 	getColor() const;
-				
-				void	setName(const string name);
-				void	setLevel(const int level);
-				void	setColor(const string color);
-		};
+
 	}
 }
 

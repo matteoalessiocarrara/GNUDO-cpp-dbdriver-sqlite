@@ -26,6 +26,8 @@
 
 # include <sqlite3pp.hpp>
 
+# include "gnudo.hpp"
+# include "managers.hpp"
 # include "objects.hpp"
 # include "dbdefs.hpp"
 
@@ -44,7 +46,7 @@ using std::time;
 // A parte setModificationTime ovviamente XD
 
 
-Task::Task(const int64_t id, sqlite3* db, TasksManager *parentManager): sqlite3pp::objects::Row(db, tables::tasks, id), gnudo::abstract::Task((gnudo::abstract::TasksManager*)parentManager)
+Task::Task(const int64_t id, sqlite3* db, TasksManager *parentManager): sqlite3pp::objects::Row(db, tables::tasks, id), gnudo::abstract::Task((gnudo::abstract::TasksManager*)parentManager, id)
 {
 }
 
@@ -63,10 +65,11 @@ Task::getDescription() const
 }
 
 
-int
+PriorityLevel *
 Task::getPriorityLevel() const
 {
-	return getColumn<int>(columns::task::priority, sqlite3pp_column_int);
+	int64_t id = getColumn<sqlite3_int64>(columns::task::priority, sqlite3pp_column_int64);
+	return new PriorityLevel(sqlite3pp::objects::Row::getParentDb(), id, getParentManager()->getParentDb()->getPriorityLevels());
 }
 
 		class Db;
@@ -165,7 +168,7 @@ Task::setModificationTime(const time_t time)
 }
 
 
-PriorityLevel::PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager): sqlite3pp::objects::Row(db, tables::priorityLevels, id), gnudo::abstract::PriorityLevel((gnudo::abstract::PriorityLevelsManager*)parentManager)
+PriorityLevel::PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager): sqlite3pp::objects::Row(db, tables::priorityLevels, id), gnudo::abstract::PriorityLevel((gnudo::abstract::PriorityLevelsManager*)parentManager, id)
 {
 }
 

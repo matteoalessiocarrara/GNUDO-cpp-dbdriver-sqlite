@@ -178,7 +178,7 @@ PriorityLevelsManager::getPriorityLevel(const int64_t id) const
 	if (not isValidId(id))
 		throw ObjectNotFoundException("Livello di priorità non trovato: " + to_string(id));
 	
-	return new PriorityLevel(id, sqlite3pp::objects::Table::getParentDb(), this);
+	return new PriorityLevel(sqlite3pp::objects::Table::getParentDb(), id, this);
 }
 
 

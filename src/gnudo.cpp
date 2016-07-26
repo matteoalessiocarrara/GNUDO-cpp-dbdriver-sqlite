@@ -72,6 +72,14 @@ Db::__createTables()
 	string sql	=	"BEGIN TRANSACTION;"
 					"PRAGMA foreign_keys = ON;"
 					
+					"CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::priorityLevels +
+					"("
+					+ dbdefs::columns::prioritylevel::id + " INTEGER PRIMARY KEY,"
+					+ dbdefs::columns::prioritylevel::name + "	TEXT NOT NULL,"
+					+ dbdefs::columns::prioritylevel::color + " TEXT NOT NULL,"
+					+ dbdefs::columns::prioritylevel::priority + " INTEGER NOT NULL"
+					");"
+					
 					"CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::tasks +
 					"("
 					+ dbdefs::columns::task::id + " INTEGER PRIMARY KEY,"
@@ -80,15 +88,8 @@ Db::__createTables()
 					+ dbdefs::columns::task::creationTime + " INTEGER NOT NULL,"
 					+ dbdefs::columns::task::modificationTime + " INTEGER NOT NULL,"
 					+ dbdefs::columns::task::completed + " INTEGER NOT NULL,"
-					"FOREIGN KEY(" + dbdefs::columns::task::priority + ") NOT NULL REFERENCES "  + dbdefs::tables::priorityLevels + "(" + dbdefs::columns::prioritylevel::id + ") ON DELETE RESTRICT"
-					");"
-					
-					"CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::priorityLevels +
-					"("
-					+ dbdefs::columns::prioritylevel::id + " INTEGER PRIMARY KEY,"
-					+ dbdefs::columns::prioritylevel::name + "	TEXT NOT NULL,"
-					+ dbdefs::columns::prioritylevel::color + " TEXT NOT NULL,"
-					+ dbdefs::columns::prioritylevel::priority + " INTEGER NOT NULL"
+					+ dbdefs::columns::task::priority + " INTEGER NOT NULL,"
+					"FOREIGN KEY(" + dbdefs::columns::task::priority + ") REFERENCES "  + dbdefs::tables::priorityLevels + "(" + dbdefs::columns::prioritylevel::id + ") ON DELETE RESTRICT"
 					");"
 					
 					"END TRANSACTION;";

@@ -92,31 +92,35 @@ TasksManager::add(const int priorityId, const string title, const string descrip
 vector<int64_t>
 TasksManager::getIdList(int orderBy, bool ascending) const
 {
+	vector<sqlite3_int64> tmp;
+
 	switch(orderBy)
 	{
 		case TITLE:
-			sqlite3pp::objects::Table::getIdList(columns::task::title, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::task::title, ascending);
 			break;
 		case DESCRIPTION:
-			sqlite3pp::objects::Table::getIdList(columns::task::description, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::task::description, ascending);
 			break;
 		case CREATION_TIME:
-			sqlite3pp::objects::Table::getIdList(columns::task::creationTime, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::task::creationTime, ascending);
 			break;
 		case MODIFICATION_TIME:
-			sqlite3pp::objects::Table::getIdList(columns::task::modificationTime, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::task::modificationTime, ascending);
 			break;
 		case PRIORITY:
-			sqlite3pp::objects::Table::getIdList(columns::task::priority, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::task::priority, ascending);
 			break;
 		case COMPLETED:
-			sqlite3pp::objects::Table::getIdList(columns::task::completed, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::task::completed, ascending);
 			break;
 		case ID:
-			sqlite3pp::objects::Table::getIdList(columns::task::id, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::task::id, ascending);
 			break;
 		// TODO Default?
 	}
+	
+	return vector<int64_t>(tmp.begin(), tmp.end());
 }
 
 
@@ -178,21 +182,25 @@ PriorityLevelsManager::add(const string name, const int priority, const string c
 vector<int64_t>
 PriorityLevelsManager::getIdList(int orderBy, bool ascending) const
 {
+	vector<sqlite3_int64> tmp;
+
 	switch(orderBy)
 	{
 		case NAME:
-			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::name, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::prioritylevel::name, ascending);
 			break;
 		case PRIORITY:
-			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::priority, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::prioritylevel::priority, ascending);
 			break;
 		case COLOR:
-			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::color, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::prioritylevel::color, ascending);
 			break;
 		case ID:
-			sqlite3pp::objects::Table::getIdList(columns::prioritylevel::id, ascending);
+			tmp = sqlite3pp::objects::Table::getIdList(columns::prioritylevel::id, ascending);
 			break;
 	}
+	
+	return vector<int64_t>(tmp.begin(), tmp.end());
 }
 
 

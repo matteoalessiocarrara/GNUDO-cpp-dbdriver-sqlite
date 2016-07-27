@@ -29,7 +29,6 @@
 # include "dbdefs.hpp"
 # include "managers.hpp"
 #include "gnudo.hpp"
-#include "../../sqlite3pp/src/sqlite3pp.hpp"
 
 
 using namespace gnudo::abstract::exceptions;

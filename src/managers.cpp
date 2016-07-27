@@ -29,6 +29,7 @@
 # include "dbdefs.hpp"
 # include "managers.hpp"
 #include "gnudo.hpp"
+#include "../../sqlite3pp/src/sqlite3pp.hpp"
 
 
 using namespace gnudo::abstract::exceptions;
@@ -221,4 +222,21 @@ PriorityLevelsManager::remove(const int64_t id)
 }
 
 
+void
+PriorityLevelsManager::remove(const int64_t id, int64_t moveToPriority)
+{
+	
+	vector<int64_t> tasks = gnudo::abstract::Manager::getParentDb()->getTasks()->getIdList(gnudo::abstract::TasksManager::Order::CREATION_TIME);
+	
+	for(vector<int64_t>::iterator i = tasks.begin(); i != tasks.end(); i++)
+	{	Task *tmp = gnudo::abstract::Manager::getParentDb()->getTasks()->getTask(*i);
+		
+		if (tmp->getPriorityLevel()->sqlite3pp::objects::Row::getId() == id)
+			tmp->setPriorityLevel(moveToPriority);
+		
+		delete tmp;
+	}
+	
+	remove(id);
+}
 

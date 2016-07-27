@@ -72,6 +72,8 @@ namespace gnudo
 				vector<int64_t> getIdList(int orderBy=Order::PRIORITY, bool ascending=false) const;
 				PriorityLevel*	getPriorityLevel(const int64_t id) const;
 				void			remove(const int64_t id); // WARNING Non deve essere chiamato questo direttamente, ma il metodo ereditato da gnudo::abstract::PriorityLevelsManager
+				void			remove(const int64_t id, int64_t moveToPriority);
+			
 		};
 	}
 }

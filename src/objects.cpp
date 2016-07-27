@@ -197,6 +197,7 @@ PriorityLevel::getName() const
 void
 PriorityLevel::setColor(const string color)
 {
+	// TODO Controllare validità
 	sqlite3_stmt *ppStmt = getUpdateStatement(columns::prioritylevel::color);
 
 	sqlite3pp_bind_text(ppStmt, 1, color.c_str(), color.size() + 1, SQLITE_STATIC);

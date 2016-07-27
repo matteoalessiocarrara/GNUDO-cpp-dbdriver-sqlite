@@ -176,7 +176,7 @@ PriorityLevel::PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManage
 string
 PriorityLevel::getColor() const
 {
-	return (const char*)getColumn<const unsigned char*>(columns::prioritylevel::color, sqlite3pp_column_text);
+	return (const char*)getColumn<const unsigned char*>(columns::prioritylevel::color, sqlite3pp_column_text, true);
 }
 
 
@@ -190,7 +190,7 @@ PriorityLevel::getLevel() const
 string
 PriorityLevel::getName() const
 {
-	return (const char*)getColumn<const unsigned char*>(columns::prioritylevel::name, sqlite3pp_column_text);
+	return (const char*)getColumn<const unsigned char*>(columns::prioritylevel::name, sqlite3pp_column_text, true);
 }
 
 

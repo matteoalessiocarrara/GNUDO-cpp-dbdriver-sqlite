@@ -54,14 +54,14 @@ Task::Task(const int64_t id, sqlite3* db, TasksManager *parentManager): sqlite3p
 string
 Task::getTitle() const
 {
-	return (const char*)getColumn<const unsigned char*>(columns::task::title, sqlite3pp_column_text);
+	return (const char*)getColumn<const unsigned char*>(columns::task::title, sqlite3pp_column_text, true);
 }
 
 
 string
 Task::getDescription() const
 {
-	return (const char*)getColumn<const unsigned char*>(columns::task::description, sqlite3pp_column_text);
+	return (const char*)getColumn<const unsigned char*>(columns::task::description, sqlite3pp_column_text, true);
 }
 
 

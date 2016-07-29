@@ -22,6 +22,7 @@
 # ifndef GNUDO_SQLITE_MANAGERS_HPP
 # define GNUDO_SQLITE_MANAGERS_HPP
 
+# include <stdexcept>
 # include <cstdint>
 # include <vector>
 # include <string>
@@ -38,43 +39,59 @@ namespace gnudo
 {
 	namespace sqlite
 	{
-		using std::vector;
-		using std::string;
-		using std::time_t;
-		using std::time;
-		using std::int64_t;
-		
 		class Db;
 
 
-		// TODO Non tutti i metodi di sqlite3pp::objects::Table dovrebbero essere visibili in queste classi...
-
-		
-		class TasksManager: public sqlite3pp::objects::Table, public gnudo::abstract::TasksManager
+		namespace exceptions
 		{
-			public:
-								TasksManager(sqlite3 *db, Db *gnudoDb);
-				int64_t			add(const int priorityId, const string title="Untitled", const string description="", const time_t creationTime=time(NULL),
-									const time_t modificationTime=time(NULL), const bool completed=false);
-				vector<int64_t>	getIdList(int orderBy=Order::PRIORITY, bool ascending=false) const;
-				Task*			getTask(const int64_t id) const;
-				void			remove(const int64_t id);
-		};
-		
-		
-		class PriorityLevelsManager: public sqlite3pp::objects::Table, public gnudo::abstract::PriorityLevelsManager
-		{
-			public:
-									PriorityLevelsManager(sqlite3 *db, Db *gnudoDb);
+			class TaskNotFoundException: public std::runtime_error
+			{
+				public:
+					TaskNotFoundException(const std::string &msg): std::runtime_error(msg) {}
+			};
+		}
 
-				// TODO cambiare priority in unsigned
-				int64_t	 		add(const string name, const int priority, const string color="#00ff00"); // TODO Possono esistere due con la stessa priorità?
-				vector<int64_t> getIdList(int orderBy=Order::PRIORITY, bool ascending=false) const;
-				PriorityLevel*	getPriorityLevel(const int64_t id) const;
-				void			remove(const int64_t id); // WARNING Non deve essere chiamato questo direttamente, ma il metodo ereditato da gnudo::abstract::PriorityLevelsManager
-				void			remove(const int64_t id, int64_t moveToPriority);
-			
-		};
+
+		namespace managers
+		{
+			using std::int64_t;
+			using std::vector;
+			using std::string;
+			using std::time_t;
+			using std::time;
+
+			using namespace objects;
+
+
+			class TasksManager: public sqlite3pp::objects::Table, public gnudo::abstract::managers::TasksManager
+			{
+				public:
+					TasksManager(sqlite3 *db, Db *gnudoDb);
+
+					vector<int64_t>		getIdList(int orderBy, bool ascending) const;
+					Task				*getObject(const int64_t id) const;
+					void				remove(const int64_t id);
+
+				protected:
+					int64_t				_add(const int64_t priority, const string title, const string description, const time_t creationTime,
+					                         const time_t modificationTime, const bool completed);
+
+			};
+
+
+			class PriorityLevelsManager: public sqlite3pp::objects::Table, public gnudo::abstract::managers::PriorityLevelsManager
+			{
+				public:
+					PriorityLevelsManager(sqlite3 *db, Db *gnudoDb);
+
+					vector<int64_t> 	getIdList(int orderBy, bool ascending) const;
+					PriorityLevel		*getObject(const int64_t id) const;
+
+				protected:
+					int64_t	 			_add(const string name, const int64_t priority, const string color);
+					void				_remove(const int64_t id);
+			};
+		}
 	}
 }
 

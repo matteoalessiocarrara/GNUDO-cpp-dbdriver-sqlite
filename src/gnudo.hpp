@@ -24,7 +24,6 @@
 // TODO Liberare memoria puntatori
 // TODO Rimuovere include/using inutili
 // TODO Riutilizzare sqlite3_stmt
-// TODO Rinominare define da GNUDO_SQLITE_* a GNUDO_CPP_DBDRIVER_SQLITE_* ?
 
 
 # ifndef GNUDO_SQLITE_GNUDO_HPP
@@ -49,19 +48,19 @@ namespace gnudo
 		class Db: public gnudo::abstract::Db
 		{
 			public:
-										Db(const string filename);
-										~Db();
-				TasksManager*			getTasks();
-				PriorityLevelsManager* 	getPriorityLevels();
+				Db(const string filename);
+				~Db();
+				managers::TasksManager				*getTasks();
+				managers::PriorityLevelsManager 	*getPriorityLevels();
 
 			private:
-				void 					__createTables();
-				
-				sqlite3					*__sqlitedb;
-				TasksManager			*__tasksManager;
-				PriorityLevelsManager	*__priorityLevels;
+				void 								__createTables();
+
+				sqlite3								*__sqlitedb;
+				managers::TasksManager				*__tasksManager;
+				managers::PriorityLevelsManager		*__priorityLevels;
 		};
-		
+
 
 	}
 }

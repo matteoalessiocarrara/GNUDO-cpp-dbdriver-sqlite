@@ -26,17 +26,20 @@
 
 # include <sqlite3pp.hpp>
 
+# include "dbdefs.hpp"
 # include "gnudo.hpp"
 # include "managers.hpp"
 # include "objects.hpp"
-# include "dbdefs.hpp"
 
 
+using namespace gnudo::sqlite::objects;
+using namespace gnudo::sqlite::dbdefs;
 using namespace sqlite3pp::functions;
 using namespace gnudo::sqlite;
-using namespace dbdefs;
+
 using std::int64_t;
 using std::string;
+using std::time_t;
 using std::cout;
 using std::endl;
 using std::time;
@@ -46,7 +49,7 @@ using std::time;
 // A parte setModificationTime ovviamente XD
 
 
-Task::Task(const int64_t id, sqlite3* db, TasksManager *parentManager): sqlite3pp::objects::Row(db, tables::tasks, id), gnudo::abstract::Task((gnudo::abstract::TasksManager*)parentManager, id)
+Task::Task(const int64_t id, sqlite3* db, TasksManager *parentManager): sqlite3pp::objects::Row(db, tables::tasks, id), gnudo::abstract::objects::Task((gnudo::abstract::managers::TasksManager*)parentManager, id)
 {
 }
 
@@ -72,7 +75,7 @@ Task::getPriorityLevel() const
 	return new PriorityLevel(sqlite3pp::objects::Row::getParentDb(), id, getParentManager()->getParentDb()->getPriorityLevels());
 }
 
-		class Db;
+
 time_t
 Task::getCreationTime() const
 {
@@ -121,11 +124,11 @@ Task::setDescription(const string description)
 
 
 void
-Task::setPriorityLevel(const int priorityId)
+Task::setPriorityLevel(const int64_t priority)
 {
 	sqlite3_stmt *ppStmt = getUpdateStatement(columns::task::priority);
 
-	sqlite3pp_bind_int(ppStmt, 1, priorityId);
+	sqlite3pp_bind_int64(ppStmt, 1, priority);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 	
@@ -168,7 +171,7 @@ Task::setModificationTime(const time_t time)
 }
 
 
-PriorityLevel::PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager): sqlite3pp::objects::Row(db, tables::priorityLevels, id), gnudo::abstract::PriorityLevel((gnudo::abstract::PriorityLevelsManager*)parentManager, id)
+PriorityLevel::PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager): sqlite3pp::objects::Row(db, tables::priorityLevels, id), gnudo::abstract::objects::PriorityLevel((gnudo::abstract::managers::PriorityLevelsManager*)parentManager, id)
 {
 }
 
@@ -180,10 +183,10 @@ PriorityLevel::getColor() const
 }
 
 
-int
+int64_t
 PriorityLevel::getLevel() const
 {
-	return getColumn<int>(columns::prioritylevel::priority, sqlite3pp_column_int);
+	return getColumn<sqlite3_int64>(columns::prioritylevel::priority, sqlite3pp_column_int64);
 }
 
 
@@ -201,17 +204,6 @@ PriorityLevel::setColor(const string color)
 	sqlite3_stmt *ppStmt = getUpdateStatement(columns::prioritylevel::color);
 
 	sqlite3pp_bind_text(ppStmt, 1, color.c_str(), color.size() + 1, SQLITE_STATIC);
-	sqlite3pp_step(ppStmt);
-	sqlite3_finalize(ppStmt);
-}
-
-
-void
-PriorityLevel::setLevel(const int level)
-{
-	sqlite3_stmt *ppStmt = getUpdateStatement(columns::prioritylevel::priority);
-
-	sqlite3pp_bind_int(ppStmt, 1, level);
 	sqlite3pp_step(ppStmt);
 	sqlite3_finalize(ppStmt);
 }

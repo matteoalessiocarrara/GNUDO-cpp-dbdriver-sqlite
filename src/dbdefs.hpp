@@ -49,13 +49,11 @@ namespace gnudo
 					const string creationTime = "ctime";
 					const string modificationTime = "mtime";
 					const string completed = "completed";
-					const string priority = "priority";
+					const string priority = "priority"; 
 				}
 				
 				namespace prioritylevel
 				{
-						//id name color priority
-					const string id = "id";
 					const string name = "name";
 					const string color = "color";
 					const string priority = "priority";

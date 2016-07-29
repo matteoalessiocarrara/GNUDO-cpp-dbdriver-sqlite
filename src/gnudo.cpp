@@ -26,8 +26,10 @@
 # include "gnudo.hpp"
 
 
+using namespace gnudo::sqlite::managers;
 using namespace sqlite3pp::functions;
 using namespace gnudo::sqlite;
+
 using std::string;
 
 
@@ -67,36 +69,35 @@ Db::getPriorityLevels()
 
 void
 Db::__createTables()
-{	
+{
 	char *err	=	 NULL;
 	string sql	=	"BEGIN TRANSACTION;"
-					"PRAGMA foreign_keys = ON;"
-					
-					"CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::priorityLevels +
-					"("
-					+ dbdefs::columns::prioritylevel::id + " INTEGER PRIMARY KEY,"
-					+ dbdefs::columns::prioritylevel::name + "	TEXT NOT NULL,"
-					+ dbdefs::columns::prioritylevel::color + " TEXT NOT NULL,"
-					+ dbdefs::columns::prioritylevel::priority + " INTEGER NOT NULL"
-					");"
-					
-					"CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::tasks +
-					"("
-					+ dbdefs::columns::task::id + " INTEGER PRIMARY KEY,"
-					+ dbdefs::columns::task::title	+ "	TEXT NOT NULL,"
-					+ dbdefs::columns::task::description + " TEXT,"
-					+ dbdefs::columns::task::creationTime + " INTEGER NOT NULL,"
-					+ dbdefs::columns::task::modificationTime + " INTEGER NOT NULL,"
-					+ dbdefs::columns::task::completed + " INTEGER NOT NULL,"
-					+ dbdefs::columns::task::priority + " INTEGER NOT NULL,"
-					"FOREIGN KEY(" + dbdefs::columns::task::priority + ") REFERENCES "  + dbdefs::tables::priorityLevels + "(" + dbdefs::columns::prioritylevel::id + ") ON DELETE RESTRICT"
-					");"
-					
-					"END TRANSACTION;";
+	                "PRAGMA foreign_keys = ON;"
 
-	sqlite3pp_exec(__sqlitedb, sql.c_str(), NULL, NULL, &err);	
-	
-	if (err != NULL)
+	                "CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::priorityLevels +
+	                "("
+	                + dbdefs::columns::prioritylevel::priority + " INTEGER PRIMARY KEY,"
+	                + dbdefs::columns::prioritylevel::name + "	TEXT NOT NULL,"
+	                + dbdefs::columns::prioritylevel::color + " TEXT NOT NULL,"
+	                ");"
+
+	                "CREATE TABLE  IF NOT EXISTS " + dbdefs::tables::tasks +
+	                "("
+	                + dbdefs::columns::task::id + " INTEGER PRIMARY KEY,"
+	                + dbdefs::columns::task::title	+ "	TEXT NOT NULL,"
+	                + dbdefs::columns::task::description + " TEXT,"
+	                + dbdefs::columns::task::creationTime + " INTEGER NOT NULL,"
+	                + dbdefs::columns::task::modificationTime + " INTEGER NOT NULL,"
+	                + dbdefs::columns::task::completed + " INTEGER NOT NULL,"
+	                + dbdefs::columns::task::priority + " INTEGER NOT NULL,"
+	                "FOREIGN KEY(" + dbdefs::columns::task::priority + ") REFERENCES "  + dbdefs::tables::priorityLevels + "(" + dbdefs::columns::prioritylevel::priority + ") ON DELETE RESTRICT"
+	                ");"
+
+	                "END TRANSACTION;";
+
+	sqlite3pp_exec(__sqlitedb, sql.c_str(), NULL, NULL, &err);
+
+	if(err != NULL)
 		throw std::runtime_error(err);
 }
 

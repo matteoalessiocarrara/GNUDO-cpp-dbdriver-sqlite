@@ -38,50 +38,54 @@ namespace gnudo
 		using std::int64_t;
 		using std::string;
 		using std::time_t;
-		
-		class TasksManager;
-		class PriorityLevelsManager;
-		
-		// TODO Non tutti i metodi di sqlite3pp::objects::Row dovrebbero essere visibili in queste classi derivate!
-		
-		
-		class PriorityLevel: public sqlite3pp::objects::Row, public gnudo::abstract::PriorityLevel
+
+
+		namespace managers
 		{
-		public:
-			PriorityLevel(sqlite3* db, const int64_t id, PriorityLevelsManager *parentManager);
-			
-			string	getName() const;
-			int		getLevel() const;
-			string 	getColor() const;
-			
-			void	setName(const string name);
-			void	setLevel(const int level);
-			void	setColor(const string color);
-		};
-		
-		
-		class Task: public sqlite3pp::objects::Row, public gnudo::abstract::Task
+			class TasksManager;
+			class PriorityLevelsManager;
+		}
+
+
+		namespace objects
 		{
-			public:
-								Task(const int64_t id, sqlite3 *db, TasksManager *parentManager);
-
-				string			getTitle() const;
-				string			getDescription() const;
-				PriorityLevel	*getPriorityLevel() const;
-				time_t 			getCreationTime() const;
-				time_t 			getModificationTime() const;
-				bool 			isCompleted() const;
-
-				void 			setTitle(const string title);
-				void 			setDescription(const string description);
-				void			setPriorityLevel(const int priorityId);
-				void			setCreationTime(const time_t time);
-				void 			setModificationTime(const time_t time);
-				void 			setStatus(const bool isCompleted);
-		};
-		
+			using namespace managers;
 
 
+			class PriorityLevel: public sqlite3pp::objects::Row, public gnudo::abstract::objects::PriorityLevel
+			{
+				public:
+					PriorityLevel(sqlite3 *db, const int64_t id, PriorityLevelsManager *parentManager);
+
+					string		getName() const;
+					int64_t		getLevel() const;
+					string 		getColor() const;
+
+					void		setName(const string name);
+					void		setColor(const string color);
+			};
+
+
+			class Task: public sqlite3pp::objects::Row, public gnudo::abstract::objects::Task
+			{
+				public:
+					Task(const int64_t id, sqlite3 *db, TasksManager *parentManager);
+
+					string			getTitle() const;
+					string			getDescription() const;
+					PriorityLevel	*getPriorityLevel() const;
+					time_t 			getCreationTime() const;
+					time_t 			getModificationTime() const;
+					bool 			isCompleted() const;
+
+					void 			setTitle(const string title);
+					void 			setDescription(const string description);
+					void			setPriorityLevel(const int64_t priority);
+					void			setCreationTime(const time_t time);
+					void 			setModificationTime(const time_t time);
+					void 			setStatus(const bool isCompleted);
+			};
+		}
 	}
 }
 

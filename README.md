@@ -1,4 +1,10 @@
-# Dipendenze
+# Lavori in corso
 
- * [sqlite3pp](https://github.com/matteoalessiocarrara/sqlite3pp)
- * [GNUDO-cpp-dbdriver-abstract](https://github.com/matteoalessiocarrara/GNUDO-cpp-dbdriver-abstract)
+Implementazione del driver astratto di GNUDO per sqlite
+
+
+## Aggiornamenti
+
+È possibile iscriversi al canale [telegram](https://telegram.me/matteoalessiocarrara) 
+od alla comoda pagina [facebook](https://www.facebook.com/matteoalessiocarrara).
+
